@@ -1,8 +1,8 @@
 name: Release Civo Image
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -11,6 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+         go-version: '>=1.20.0'
+      - name: Build binary
+        run: |
+          cd cluster-autoscaler && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o cluster-autoscaler-amd64  
       - name: Get tag
         id: tag
         uses: dawidd6/action-get-tag@v1
@@ -26,7 +33,8 @@ jobs:
       - name: Build and push (docker)
         uses: docker/build-push-action@v2
         with:
-          file: Dockerfile
+          context: cluster-autoscaler
+          file: cluster-autoscaler/Dockerfile.amd64
           push: true
           build-args: |
             VERSION=${{ steps.tag.outputs.tag }}
