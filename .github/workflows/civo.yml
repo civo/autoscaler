@@ -33,7 +33,8 @@ jobs:
       - name: Build and push (docker)
         uses: docker/build-push-action@v2
         with:
-          file: cluster-autoscaler/Dockerfile.amd64
+          context: cluster-autoscaler
+          file: Dockerfile.amd64
           push: true
           build-args: |
             VERSION=${{ steps.tag.outputs.tag }}
